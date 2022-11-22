@@ -1,92 +1,50 @@
 <script>
+import SingleTreeSelect from './components/SingleTreeSelect.vue'
+import { treeData } from './constants/test'
+
 export default {
+  components: {
+    SingleTreeSelect
+  },
+
   data() {
     return {
-      options: [{
-        value: '选项1',
-        label: '黄金糕'
-      }, {
-        value: '选项2',
-        label: '双皮奶'
-      }, {
-        value: '选项3',
-        label: '蚵仔煎'
-      }, {
-        value: '选项4',
-        label: '龙须面'
-      }, {
-        value: '选项5',
-        label: '北京烤鸭'
-      }],
-      value: '',
-      popoverVisible: false
+      value: 0,
+      treeData
     }
   },
 
   watch: {
-    popoverVisible(newVal) {
-      if(newVal) {
-        console.log(this.$refs['tree-select'])
-      }
-    }
-  },
-
-  computed: {
-    treeSelectClassName () {
-      return this.popoverVisible ? 'tree-select' : 'tree-select tree-select'
+    value(v) {
+      console.log(v, 'value') 
     }
   },
 
   methods: {
-    handleSelectOnFocus() {
-      this.popoverVisible = true
-    },
-
-    handleSelectOnBlur() {
-      this.popoverVisible = false
-    },
-
-    handle2FocusSelect() {
-      const treeSelect = this.$refs['tree-select']
-      treeSelect.focus()
+    handleSelect(value) {
+      this.value = value
     }
-  },
+  }
 }
 </script>
 
 <template>
-  <div class="tree-select">
-    <el-input
-      mutiple
-      ref="tree-select"
-      v-popover:tree-select-popover
-      v-model="value"
-      :class="{'is-focus': popoverVisible}"
-      @focus="handleSelectOnFocus"
-    />
-    <el-popover
-      ref="tree-select-popover"
-      placement="bottom"
-      title="标题"
-      width="100%"
-      trigger="manual"
-      content="这是一段内容,这是一段内容,这是一段内容,这是一段内容。"
-      transition="el-zoom-in-top"
-      v-model="popoverVisible"
-      @click="handle2FocusSelect"
-    >
-    </el-popover>
+  <div class="container">
+    <div class="wrapper">
+      <single-tree-select v-model="value" :tree-data="treeData" placeholder="请选择" @select="handleSelect"/>
+    </div>
   </div>
 </template>
 
-
 <style>
-.tree-select .select-popper {
-  display: none;
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
 }
 
-.el-input.is-focus .el-input__inner {
-  border-color: #409EFF;
-  outline: 0;
+.wrapper {
+  width: 320px;
 }
 </style>
