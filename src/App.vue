@@ -23,6 +23,10 @@ export default {
   methods: {
     handleSelect(value) {
       this.value = value
+    },
+
+    handleReset() {
+      this.value = 0
     }
   }
 }
@@ -32,6 +36,7 @@ export default {
   <div class="container">
     <div class="wrapper">
       <single-tree-select v-model="value" :tree-data="treeData" placeholder="请选择" @select="handleSelect"/>
+      <el-button @click="handleReset">重置</el-button>
     </div>
   </div>
 </template>

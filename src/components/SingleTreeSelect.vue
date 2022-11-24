@@ -24,13 +24,17 @@ export default {
       width: 0,
       popoverVisible: false,
     }
-  },  
+  }, 
+
+  watch: {
+    value(v) {
+      if(!valueEquals(v, this.selectedValue.id)) {
+        this.setSelected()
+      }
+    }
+  },
 
   computed: {
-    treeSelectClassName () {
-      return this.popoverVisible ? 'tree-select' : 'tree-select tree-select'
-    },
-
     inputSuffixClass() {
       return this.popoverVisible ? 'arrow-up is-reverse' : 'arrow-up'
     }
@@ -38,28 +42,38 @@ export default {
 
   mounted() {
     if(typeof this.value !== 'undefined') {
-      const _opt = this.getFullOptionsByValueFromArray(this.treeData, this.value)
-      if(_opt) this.selectedValue = _opt
+      this.setSelected()
     }
 
+    // 获取容器宽度 使弹窗宽度100%
     this.$nextTick(() => { 
       this.width = this.$refs.wrapper.offsetWidth || 0
     })
   },
 
   methods: {
+    /**
+     * 展开下拉框
+     */
     handlePopoverShow () {
       this.popoverVisible = true
     },
 
+    /**
+     * 收起下来框
+     */
     handlePopoverClose() {
       this.popoverVisible =false
     },
 
+    /**
+     * 选择节点
+     * @param {{ id: number, label: string }} value 
+     */
     handleSelectNode (value) {
       if(!value) return
       this.selectedValue = value
-      this.emitSelect(value.value)
+      this.emitSelect(value.id)
       this.handlePopoverClose()
     },
 
@@ -67,20 +81,31 @@ export default {
       this.$refs['input'].focus()
     },
 
+    /**
+     * 向父节点传递值
+     * @param {number} value 
+     */
     emitSelect (value) {
       if(!valueEquals(this.value, value)) {
         this.$emit('select', value)
       }
     },
 
-    getFullOptionsByValueFromArray (array = [], value) {
+    setSelected() {
+      const _opt = this.getFullOptionsByValueFromArray(this.treeData)
+      this.selectedValue = _opt || {}
+    },
+
+
+    getFullOptionsByValueFromArray (array = []) {
       for(let i = 0, len = array.length; i < len - 1; i ++) {
-        if(array[i].value === value) {
-          return array[i]
+        const current = array[i]
+        if(current.id === this.value) {
+          return current
         }
 
-        if(Array.isArray(array[i].children)) {
-          const result = this.getFullOptionsByValueFromArray(array[i].children, value)
+        if(Array.isArray(current.children)) {
+          const result = this.getFullOptionsByValueFromArray(current.children)
           if(result) return result
         }
       }
@@ -144,7 +169,7 @@ export default {
 }
 
 .tree-select-popover .el-popover {
-  transition-delay: .05s !important;
+  transition-delay: .05s !important; /** 延迟动画效果，避免展开或收起树节点时`弹窗`有短暂的收缩动画 */
 }
 </style>
 
